@@ -68,6 +68,51 @@ class FutureSelection:
         y_test_enc = le.transform(y_test)
         return y_train_enc, y_test_enc
 
+    def remove_low_variance_features(self): # this method does not have any predict method. It just has fit method.
+
+        # prepare input data
+        X_enc , _ = self.prepare_inputs(self.X , [])
+        print(X_enc.shape)
+        sel = VarianceThreshold(threshold=(.8 * (1 - .8)))
+        print(sel.fit(X_enc))
+
+        print(sel.transform(X_enc))
+
+        cols = sel.get_support(indices=1)
+        col_names = [self.fields[col] for col in cols]
+
+        print(f"col names = {col_names}")
+
+    def apply_recursive_feature_selection(self): # uzun suruyorr
+        X_enc, _ = self.prepare_inputs(self.X, [])
+
+        m = RFECV(RandomForestClassifier(), scoring='accuracy')
+        print(m.fit(X_enc, self.y))
+        print(m.score(X_enc, self.y))
+
+
+        cols = m.get_support(indices=1)
+        col_names = [self.fields[col] for col in cols]
+
+        print(f"col names = {col_names}")
+
+
+    def apply_select_from_model(self):
+        X_enc, _ = self.prepare_inputs(self.X, [])
+
+        m = SelectFromModel(LinearSVC(C=0.01, penalty='l1', dual=False))
+
+        print(m.fit(X_enc, self.y))
+
+        print(f"before future selection : {X_enc.shape} , after future selection : {m.transform(X_enc).shape}")
+
+        print(m.transform(X_enc))
+
+
+        cols = m.get_support(indices=1)
+        col_names = [self.fields[col] for col in cols]
+
+        print(f"col names = {col_names}")
 
 
     def get_train_test_split(self):

@@ -36,8 +36,7 @@ class Algorithms:
 
         # features = "REPORTER","ISSUE_TYPE","PRIORITY","COMPNAME","WORKER","EMPLOYEE_TYPE","WORK_LOG","CREATION_DATE","RESOLUTION_DATE","ISSUE_CATEGORY"
 
-        self.fields = ["REPORTER", "ISSUE_TYPE", "PRIORITY", "COMPNAME", "WORKER", "EMPLOYEE_TYPE", "WORK_LOG",
-                       "ISSUE_CATEGORY"]
+        self.fields = ["REPORTER", "COMPNAME", "WORKER","ISSUE_CATEGORY"]
 
         data_frame = pd.read_excel(self.file_path, engine='odf', usecols=self.fields)
         dataset = data_frame.values
@@ -103,12 +102,66 @@ class Algorithms:
         self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
         print("create svm classifier")
         # Create a svm Classifier
-        self.model = svm.SVC(kernel='linear', probability=True)  # Linear Kernel
+        self.model = svm.SVC(kernel='linear', probability=True, max_iter=100000)  # Linear Kernel
         print("cross validation")
         self.cross_validation(self.X_enc, self.y_enc)
 
         self.cmd_plot()
 
+    def ANN_algorithm(self):
+
+        self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
+
+        self.model = MLPClassifier(hidden_layer_sizes=(8, 8, 8), activation='relu', solver='adam', max_iter=500)
+
+        self.cross_validation(self.X_enc, self.y_enc)
+
+        self.cmd_plot()
+
+    def DecisionTrees_algorithm(self):
+
+        self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
+
+        # Create Decision Tree classifer object
+        self.model = DecisionTreeClassifier()
+
+        self.cross_validation(self.X_enc, self.y_enc)
+
+        self.cmd_plot()
+
+    def RandomForest_algorithm(self):
+
+        self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
+
+        self.model = RandomForestClassifier(n_estimators=100)
+
+        self.cross_validation(self.X_enc, self.y_enc)
+
+        self.cmd_plot()
+
+    def SGD_algorithm(self):
+
+        self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
+
+        self.model = SGDClassifier(loss="hinge", penalty="l2")
+        clf = self.model.fit(self.X_train, self.y_train)
+        calibrator = CalibratedClassifierCV(clf, cv='prefit')
+        self.model = calibrator.fit(self.X_train, self.y_train)
+        self.cross_validation(self.X_enc, self.y_enc)
+
+        self.cmd_plot()
+
+    def train_test_model(self, X_train, X_test, y_train, y_test):
+        """ Train and test the model using the training and test data sets. Return the predictions, accuracy and metric reports. """
+        print("model fit")
+        self.model.fit(X_train, y_train)
+        print("model prediction")
+        predictions = self.model.predict(X_test)
+        self.predictions.append(predictions)
+        accuracy = self.model.score(X_test, y_test)
+        metrics_report = classification_report(y_test, predictions)
+        precision, recall, fscore, train_support = precision_recall_fscore_support(y_test, predictions, average='macro')
+        return predictions, accuracy, metrics_report, (precision, recall, fscore)
 
     def cross_validation(self, X, y, _cv=10):
 
@@ -225,17 +278,17 @@ class Algorithms:
 # endregion
 
 if __name__ == "__main__":
-     algo = Algorithms()
-     algo.KNN_algorithm()
-    # algo1 = Algorithms()
-    # algo1.NaiveBayes_algorithm()
+    #algo = Algorithms()
+    #algo.KNN_algorithm()
+    #algo1 = Algorithms()
+    #algo1.NaiveBayes_algorithm()
     #algo2 = Algorithms()
     #algo2.SVM_algorithm()
-    # algo3 = Algorithms()
-    # algo3.ANN_algorithm()
-    # algo4 = Algorithms()
-    # algo4.DecisionTrees_algorithm()
-    # algo5 = Algorithms()
-    # algo5.RandomForest_algorithm()
-    # algo6 = Algorithms()
-    # algo6.SGD_algorithm()
+    #algo3 = Algorithms()
+    #algo3.ANN_algorithm()
+    #algo4 = Algorithms()
+    #algo4.DecisionTrees_algorithm()
+    #algo5 = Algorithms()
+    #algo5.RandomForest_algorithm()
+    algo6 = Algorithms()
+    algo6.SGD_algorithm()

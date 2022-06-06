@@ -87,6 +87,16 @@ class Algorithms:
 
         self.cmd_plot()
 
+    def NaiveBayes_algorithm(self):
+
+        self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
+
+        # Create a Gaussian Classifier
+        self.model = GaussianNB()
+
+        self.cross_validation(self.X_enc, self.y_enc)
+
+        self.cmd_plot()
 
     def cross_validation(self, X, y, _cv=10):
 

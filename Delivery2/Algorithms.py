@@ -98,6 +98,18 @@ class Algorithms:
 
         self.cmd_plot()
 
+    def SVM_algorithm(self):
+
+        self.X_train, self.X_test, self.y_train, self.y_test, self.y_enc, self.X_enc = self.get_train_test_split()
+        print("create svm classifier")
+        # Create a svm Classifier
+        self.model = svm.SVC(kernel='linear', probability=True)  # Linear Kernel
+        print("cross validation")
+        self.cross_validation(self.X_enc, self.y_enc)
+
+        self.cmd_plot()
+
+
     def cross_validation(self, X, y, _cv=10):
 
         import warnings
